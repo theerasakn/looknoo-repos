@@ -11,3 +11,6 @@ terraform.tfvars
 *.auto.tfvars
 sa-key.json
 *-key.json
+.terraform-plugins/
+.terraformrc
+tfplan
