@@ -4,9 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { PermissionsAndroid, Platform, Alert } from 'react-native';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import Geolocation from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 interface Location {
   latitude: number;

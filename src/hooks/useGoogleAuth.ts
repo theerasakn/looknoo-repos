@@ -6,7 +6,6 @@
 import { useState, useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { User } from '../types/user';
-import { decodeGoogleJwt } from '../utils/jwt';
 
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
 

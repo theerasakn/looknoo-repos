@@ -16,7 +16,7 @@ import {
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useTheme } from '../theme';
 import { TYPOGRAPHY } from '../theme/typography';
-import { RADIUS, SHADOW } from '../theme/spacing';
+import { RADIUS } from '../theme/spacing';
 import { FadeIn } from '../components/layout/FadeIn';
 import { Card } from '../components/ui/Card';
 import { Btn } from '../components/ui/Btn';

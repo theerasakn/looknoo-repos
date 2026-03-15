@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useTheme } from '../theme';
 import { TYPOGRAPHY } from '../theme/typography';
-import { RADIUS, SHADOW } from '../theme/spacing';
 import { PlaceType } from '../types/place';
 import { openGoogleMaps } from '../utils/openMaps';
 import { FadeIn } from '../components/layout/FadeIn';

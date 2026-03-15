@@ -7,7 +7,6 @@ import React from 'react';
 import {
   TouchableOpacity,
   Text,
-  StyleSheet,
   ViewStyle,
   ActivityIndicator,
 } from 'react-native';
@@ -98,4 +97,3 @@ export const Btn: React.FC<BtnProps> = ({
   );
 };
 
-const styles = StyleSheet.create({});

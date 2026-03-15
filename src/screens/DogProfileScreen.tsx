@@ -8,12 +8,9 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   ScrollView,
   StyleSheet,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../navigation/types';
 import { useTheme } from '../theme';
 import { TYPOGRAPHY } from '../theme/typography';
 import { RADIUS } from '../theme/spacing';
@@ -25,7 +22,6 @@ import { Btn } from '../components/ui/Btn';
 import { Toggle } from '../components/ui/Toggle';
 import { Card } from '../components/ui/Card';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'DogProfile'>;
 type DogSize = 'S' | 'M' | 'L' | 'XL';
 
 const SIZES: { key: DogSize; label: string; desc: string }[] = [
@@ -36,7 +32,7 @@ const SIZES: { key: DogSize; label: string; desc: string }[] = [
 ];
 
 /** Dog profile 3-step stepper screen. */
-export default function DogProfileScreen({ navigation }: Props) {
+export default function DogProfileScreen() {
   const C = useTheme();
   const setOnboardingComplete = useAuthStore(
     (s) => s.setOnboardingComplete,

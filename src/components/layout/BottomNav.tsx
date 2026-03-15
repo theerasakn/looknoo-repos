@@ -10,10 +10,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
 import { Theme } from '../../theme/colors';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { MIN_TOUCH } from '../../theme/spacing';

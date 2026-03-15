@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useTheme } from '../theme';
 import { TYPOGRAPHY } from '../theme/typography';
-import { RADIUS, SHADOW } from '../theme/spacing';
 import { openGoogleMaps } from '../utils/openMaps';
 import { FadeIn } from '../components/layout/FadeIn';
 import { TopBar } from '../components/layout/TopBar';
@@ -20,7 +19,6 @@ import { Badge } from '../components/ui/Badge';
 import { Btn } from '../components/ui/Btn';
 import { StarR } from '../components/ui/StarR';
 import { Icon } from '../components/ui/Icon';
-import { Toggle } from '../components/ui/Toggle';
 
 /** Place detail screen showing pet policy and reviews. */
 export default function PlaceDetailScreen() {

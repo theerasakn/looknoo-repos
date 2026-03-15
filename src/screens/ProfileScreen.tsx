@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { useTheme } from '../theme';
 import { TYPOGRAPHY } from '../theme/typography';
-import { RADIUS, SHADOW } from '../theme/spacing';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { useDogStore } from '../store/dogStore';

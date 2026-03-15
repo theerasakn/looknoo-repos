@@ -16,7 +16,6 @@ import { useTheme } from '../theme';
 import { TYPOGRAPHY } from '../theme/typography';
 import { RADIUS, SHADOW } from '../theme/spacing';
 import { Place, PlaceType } from '../types/place';
-import { usePlaceStore } from '../store/placeStore';
 import { useLocation } from '../hooks/useLocation';
 import { findNearestByType } from '../services/mapService';
 import { openGoogleMaps } from '../utils/openMaps';

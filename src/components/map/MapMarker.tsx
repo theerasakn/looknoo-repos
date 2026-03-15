@@ -36,7 +36,7 @@ interface MapMarkerProps {
 
 /** Custom map marker with icon, color, tooltip on selection. */
 export const MapMarker = React.memo<MapMarkerProps>(
-  ({ m, zoom, selected, onPress, C }) => {
+  ({ m, zoom, selected, C }) => {
     const color = C[TYPE_COLORS[m.type]];
     const size = selected ? 40 : zoom > 14 ? 32 : 24;
 
