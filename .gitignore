@@ -21,6 +21,17 @@ infra/terraform/*.tfstate
 infra/terraform/*.tfstate.backup
 infra/terraform/.terraform.lock.hcl
 
+# Terraform (pawtrip-infra)
+pawtrip-infra/terraform.tfvars
+pawtrip-infra/**/.terraform/
+pawtrip-infra/**/*.tfstate
+pawtrip-infra/**/*.tfstate.backup
+pawtrip-infra/**/.terraform.lock.hcl
+pawtrip-infra/**/*-outputs.json
+pawtrip-infra/**/tfplan
+pawtrip-infra/**/plan-output.txt
+pawtrip-infra/**/apply-output.txt
+
 # IDE
 .idea/
 .vscode/
