@@ -30,7 +30,7 @@ interface MapMarkerProps {
   m: Place;
   zoom: number;
   selected: boolean;
-  onPress: () => void;
+  onPress?: () => void;
   C: Theme;
 }
 

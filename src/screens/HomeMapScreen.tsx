@@ -2,42 +2,23 @@
  * HomeMapScreen — Map with markers, search, filter chips, and SOS button.
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
-import { TYPOGRAPHY } from '../theme/typography';
-import { RADIUS, SHADOW } from '../theme/spacing';
-import { Place, PlaceType } from '../types/place';
+import { Place } from '../types/place';
 import { useLocation } from '../hooks/useLocation';
 import { findNearestByType } from '../services/mapService';
-import { openGoogleMaps } from '../utils/openMaps';
-import { FadeIn } from '../components/layout/FadeIn';
 import { Icon } from '../components/ui/Icon';
-import { Badge } from '../components/ui/Badge';
+import { MapMarker } from '../components/map/MapMarker';
+import { MapControls } from '../components/map/MapControls';
+import { CurrentLocationDot } from '../components/map/CurrentLocationDot';
+import { SearchOverlay, FilterKey } from '../components/map/SearchOverlay';
 import { SOSModal } from '../components/map/SOSModal';
 
-type FilterKey = 'all' | PlaceType;
-
-interface FilterChip {
-  key: FilterKey;
-  label: string;
-}
-
-const FILTERS: FilterChip[] = [
-  { key: 'all', label: '\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14' },
-  { key: 'restaurant', label: '\u0E23\u0E49\u0E32\u0E19\u0E2D\u0E32\u0E2B\u0E32\u0E23' },
-  { key: 'accommodation', label: '\u0E17\u0E35\u0E48\u0E1E\u0E31\u0E01' },
-  { key: 'park', label: '\u0E2A\u0E27\u0E19' },
-  { key: 'vet', label: '\u0E2A\u0E31\u0E15\u0E27\u0E41\u0E1E\u0E17\u0E22\u0E4C' },
-];
+const ZOOM_DELTA = 0.005;
+const DEFAULT_DELTA = { latitudeDelta: 0.015, longitudeDelta: 0.015 };
 
 /** Demo markers for development */
 const DEMO_MARKERS: Place[] = [
@@ -73,19 +54,17 @@ export default function HomeMapScreen() {
   const C = useTheme();
   const insets = useSafeAreaInsets();
   const { location } = useLocation();
+  const mapRef = useRef<MapView>(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
-  const [selectedMarkerId, setSelectedMarkerId] = useState<number | null>(
-    null,
-  );
+  const [selectedMarkerId, setSelectedMarkerId] = useState<number | null>(null);
   const [sosVisible, setSosVisible] = useState(false);
-
-  const markers = DEMO_MARKERS;
+  const [zoom, setZoom] = useState(15);
 
   const filteredMarkers = useMemo(() => {
-    let result = markers;
+    let result: Place[] = DEMO_MARKERS;
     if (activeFilter !== 'all') {
       result = result.filter((m) => m.type === activeFilter);
     }
@@ -94,180 +73,95 @@ export default function HomeMapScreen() {
       result = result.filter((m) => m.label.toLowerCase().includes(q));
     }
     return result;
-  }, [markers, activeFilter, searchText]);
+  }, [activeFilter, searchText]);
 
   const nearestVet = useMemo(
-    () =>
-      findNearestByType(
-        markers,
-        'vet',
-        location.latitude,
-        location.longitude,
-      ),
-    [markers, location],
+    () => findNearestByType(DEMO_MARKERS, 'vet', location.latitude, location.longitude),
+    [location],
   );
 
   const handleMarkerPress = useCallback((id: number) => {
     setSelectedMarkerId((prev) => (prev === id ? null : id));
   }, []);
 
+  const handleRegionChange = useCallback((region: Region) => {
+    const z = Math.round(Math.log(360 / region.longitudeDelta) / Math.LN2);
+    setZoom(z);
+  }, []);
+
+  const animateToRegion = useCallback((delta: number) => {
+    mapRef.current?.getCamera().then((cam) => {
+      if (cam.center) {
+        mapRef.current?.animateToRegion({
+          latitude: cam.center.latitude,
+          longitude: cam.center.longitude,
+          latitudeDelta: delta,
+          longitudeDelta: delta,
+        }, 300);
+      }
+    });
+  }, []);
+
   return (
-    <View style={[styles.container, { backgroundColor: C.bgGray }]}>
-      {/* Map placeholder */}
-      <View style={[styles.mapArea, { paddingTop: insets.top }]}>
-        <View
-          style={[styles.mapPlaceholder, { backgroundColor: C.primaryLight }]}
-        >
-          <Icon name="map" size={48} color={C.primary} />
-          <Text style={[TYPOGRAPHY.body, { color: C.textSecondary }]}>
-            {'\u0E41\u0E1C\u0E19\u0E17\u0E35\u0E48 (react-native-maps)'}
-          </Text>
-
-          {/* Rendered markers list */}
-          <ScrollView
-            style={styles.markerList}
-            showsVerticalScrollIndicator={false}
-          >
-            {filteredMarkers.map((m) => (
-              <TouchableOpacity
-                key={m.id}
-                style={[
-                  styles.markerItem,
-                  {
-                    backgroundColor: C.bgCard,
-                    borderColor:
-                      selectedMarkerId === m.id
-                        ? C.primary
-                        : `${C.border}30`,
-                    borderWidth: selectedMarkerId === m.id ? 2 : 1,
-                  },
-                ]}
-                onPress={() => handleMarkerPress(m.id)}
-              >
-                <Text
-                  style={[TYPOGRAPHY.bodyMedium, { color: C.textPrimary }]}
-                >
-                  {m.label}
-                </Text>
-                <View style={styles.markerMeta}>
-                  <Badge text={m.type} C={C} />
-                  <Text
-                    style={[TYPOGRAPHY.caption, { color: C.textSecondary }]}
-                  >
-                    {m.dist}
-                  </Text>
-                </View>
-                {selectedMarkerId === m.id && (
-                  <TouchableOpacity
-                    style={[styles.navBtn, { backgroundColor: C.primary }]}
-                    onPress={() => openGoogleMaps(m.label)}
-                  >
-                    <Icon name="navigate" size={16} color="#FFFFFF" />
-                    <Text style={{ color: '#FFFFFF', fontSize: 13 }}>
-                      {'\u0E19\u0E33\u0E17\u0E32\u0E07'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </TouchableOpacity>
-            ))}
-            {filteredMarkers.length === 0 && (
-              <FadeIn>
-                <Text
-                  style={[
-                    TYPOGRAPHY.body,
-                    styles.emptyText,
-                    { color: C.textSecondary },
-                  ]}
-                >
-                  {'\u0E44\u0E21\u0E48\u0E21\u0E35\u0E2A\u0E16\u0E32\u0E19\u0E17\u0E35\u0E48\u0E43\u0E19\u0E1A\u0E23\u0E34\u0E40\u0E27\u0E13\u0E19\u0E35\u0E49'}
-                </Text>
-              </FadeIn>
-            )}
-          </ScrollView>
-        </View>
-      </View>
-
-      {/* Search bar */}
-      <View style={[styles.searchBar, { top: insets.top + 8 }]}>
-        {searchOpen ? (
-          <FadeIn
-            style={[
-              styles.searchExpanded,
-              SHADOW.card,
-              { backgroundColor: C.bgCard },
-            ]}
-          >
-            <TouchableOpacity onPress={() => setSearchOpen(false)}>
-              <Icon name="back" size={24} color={C.textPrimary} />
-            </TouchableOpacity>
-            <TextInput
-              style={[styles.searchInput, { color: C.textPrimary }]}
-              value={searchText}
-              onChangeText={setSearchText}
-              placeholder={'\u0E04\u0E49\u0E19\u0E2B\u0E32\u0E2A\u0E16\u0E32\u0E19\u0E17\u0E35\u0E48...'}
-              placeholderTextColor={C.textSecondary}
-              autoFocus
-            />
-            {searchText.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchText('')}>
-                <Icon name="close" size={20} color={C.textSecondary} />
-              </TouchableOpacity>
-            )}
-          </FadeIn>
-        ) : (
-          <TouchableOpacity
-            style={[
-              styles.searchPill,
-              SHADOW.card,
-              { backgroundColor: C.bgCard },
-            ]}
-            onPress={() => setSearchOpen(true)}
-          >
-            <Icon name="search" size={20} color={C.textSecondary} />
-            <Text style={[TYPOGRAPHY.body, { color: C.textSecondary }]}>
-              {'\u0E04\u0E49\u0E19\u0E2B\u0E32\u0E2A\u0E16\u0E32\u0E19\u0E17\u0E35\u0E48...'}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Filter chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={[styles.filterRow, { top: insets.top + 64 }]}
-        contentContainerStyle={styles.filterContent}
+    <View style={styles.container}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        initialRegion={{
+          latitude: location.latitude,
+          longitude: location.longitude,
+          ...DEFAULT_DELTA,
+        }}
+        showsUserLocation={false}
+        showsMyLocationButton={false}
+        onRegionChangeComplete={handleRegionChange}
+        onPress={() => setSelectedMarkerId(null)}
       >
-        {FILTERS.map((f) => (
-          <TouchableOpacity
-            key={f.key}
-            style={[
-              styles.chip,
-              {
-                backgroundColor:
-                  activeFilter === f.key ? C.primary : C.bgCard,
-                borderColor:
-                  activeFilter === f.key
-                    ? C.primary
-                    : `${C.border}50`,
-              },
-            ]}
-            onPress={() => setActiveFilter(f.key)}
+        {/* Current location marker */}
+        <Marker
+          coordinate={location}
+          anchor={{ x: 0.5, y: 0.5 }}
+        >
+          <CurrentLocationDot color={C.primary} />
+        </Marker>
+
+        {/* Place markers */}
+        {filteredMarkers.map((m) => (
+          <Marker
+            key={m.id}
+            coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+            anchor={{ x: 0.5, y: 1 }}
+            onPress={() => handleMarkerPress(m.id)}
           >
-            <Text
-              style={[
-                TYPOGRAPHY.caption,
-                {
-                  color:
-                    activeFilter === f.key ? '#FFFFFF' : C.textPrimary,
-                },
-              ]}
-            >
-              {f.label}
-            </Text>
-          </TouchableOpacity>
+            <MapMarker
+              m={m}
+              zoom={zoom}
+              selected={selectedMarkerId === m.id}
+              onPress={() => handleMarkerPress(m.id)}
+              C={C}
+            />
+          </Marker>
         ))}
-      </ScrollView>
+      </MapView>
+
+      <SearchOverlay
+        topOffset={insets.top}
+        searchOpen={searchOpen}
+        searchText={searchText}
+        activeFilter={activeFilter}
+        onSearchOpen={() => setSearchOpen(true)}
+        onSearchClose={() => setSearchOpen(false)}
+        onSearchChange={setSearchText}
+        onFilterChange={setActiveFilter}
+        C={C}
+      />
+
+      <MapControls
+        onZoomIn={() => animateToRegion(ZOOM_DELTA)}
+        onZoomOut={() => animateToRegion(0.05)}
+        C={C}
+      />
 
       {/* SOS button */}
       <TouchableOpacity
@@ -293,65 +187,7 @@ export default function HomeMapScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  mapArea: { flex: 1 },
-  mapPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    padding: 16,
-  },
-  markerList: { width: '100%', marginTop: 16 },
-  markerItem: {
-    borderRadius: RADIUS.card,
-    padding: 12,
-    marginBottom: 8,
-    gap: 6,
-  },
-  markerMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  navBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: RADIUS.tag,
-    alignSelf: 'flex-start',
-    marginTop: 4,
-  },
-  emptyText: { textAlign: 'center', marginTop: 24 },
-  searchBar: { position: 'absolute', left: 16, right: 16, zIndex: 10 },
-  searchPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: RADIUS.button,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  searchExpanded: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: RADIUS.button,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 8,
-  },
-  searchInput: { flex: 1, fontSize: 16, padding: 4 },
-  filterRow: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 9,
-    maxHeight: 44,
-  },
-  filterContent: { paddingHorizontal: 16, gap: 8, alignItems: 'center' },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: RADIUS.tag,
-    borderWidth: 1,
-  },
+  map: { flex: 1 },
   sosBtn: {
     position: 'absolute',
     right: 20,
