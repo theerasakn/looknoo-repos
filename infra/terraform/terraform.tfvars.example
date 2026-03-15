@@ -1,33 +1,27 @@
-# ──────────────────────────────────────────────
-# PawTrip GCP — terraform.tfvars.example
-# Copy this file to terraform.tfvars and fill in your values
-# ──────────────────────────────────────────────
+# =============================================================
+# PawTrip — terraform.tfvars
+# Copy this file to terraform.tfvars and fill in all values
+#  NEVER commit terraform.tfvars to Git
+# =============================================================
 
-# ── Billing & Organization ───────────────────
-billing_account_id   = ""   # console.cloud.google.com/billing → Account ID
-org_id               = ""   # Personal account → leave empty
+billing_account_id   = "013175-ED87A5-E97137"   # console.cloud.google.com/billing → Account ID
+org_id               = ""                         # Personal account → ทิ้งว่างไว้เสมอ
+admin_email          = "theerasak.nitlarp@gmail.com"     # GCP admin email ของคุณ
+alert_email          = "theerasak.nitlarp@gmail.com"     # รับแจ้งเตือน billing ที่ email นี้
+billing_alert_amount = 100                         # $100/เดือน
 
-# ── Admin / Alerts ───────────────────────────
-admin_email          = ""   # GCP admin email
-alert_email          = ""   # Billing alert recipient
-billing_alert_amount = 100  # USD per month
-
-# ── Region / Zone ────────────────────────────
 region = "asia-southeast1"
 zone   = "asia-southeast1-a"
 
-# ── Google Maps ──────────────────────────────
-google_maps_api_key = ""    # Google Maps Platform API key
+# --- Google Maps (พร้อมแล้ว — ใส่ key ที่มีอยู่) ---
+google_maps_api_key = "AIzaSyCPzeprLT2duNq9TvnRlhPKlGGN220xepM"
 
-# ── Google OAuth (create via STEP_0_OAUTH.md) ─
-google_oauth_client_id     = ""   # 123456-xxxxx.apps.googleusercontent.com
-google_oauth_client_secret = ""   # GOCSPX-...
+# --- Google OAuth (สร้างตาม STEP_0_OAUTH.md ก่อน แล้วกลับมากรอก) ---
+google_oauth_client_id     = "663732641526-vadugkoqiru8eq3los2t9p3mhdl7ov6q.apps.googleusercontent.com"    # รูปแบบ: 
+google_oauth_client_secret = ""    # รูปแบบ: GOCSPX-...
 
-# ── Auto-generated Secrets ───────────────────
-# Generate with:
-#   openssl rand -hex 32                                      → jwt_secret
-#   openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 20 → db passwords
-jwt_secret          = ""
-db_password_dev     = ""
-db_password_staging = ""
-db_password_prod    = ""
+# --- Auto-generated secrets (Claude Code จะ generate ให้ใน Step 2) ---
+jwt_secret          = ""   # openssl rand -hex 32
+db_password_dev     = ""   # openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 20
+db_password_staging = ""   # openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 20
+db_password_prod    = ""   # openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 20
