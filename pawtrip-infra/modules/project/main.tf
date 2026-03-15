@@ -15,6 +15,12 @@ resource "google_project" "pawtrip" {
   }
 }
 
+# Wait for billing account association to propagate
+resource "time_sleep" "wait_for_billing" {
+  depends_on      = [google_project.pawtrip]
+  create_duration = "60s"
+}
+
 # Enable required GCP APIs
 resource "google_project_service" "apis" {
   for_each = toset([
@@ -40,4 +46,6 @@ resource "google_project_service" "apis" {
   service                    = each.value
   disable_dependent_services = false
   disable_on_destroy         = false
+
+  depends_on = [time_sleep.wait_for_billing]
 }
