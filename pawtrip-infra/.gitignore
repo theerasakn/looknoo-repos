@@ -9,3 +9,5 @@ crash.log
 # Sensitive — NEVER commit
 terraform.tfvars
 *.auto.tfvars
+sa-key.json
+*-key.json
