@@ -1,0 +1,34 @@
+# ──────────────────────────────────────────────
+# PawTrip GCP — terraform.tfvars (example)
+# Copy to terraform.tfvars and fill in values
+# ⚠️  DO NOT commit terraform.tfvars to git
+# ──────────────────────────────────────────────
+
+# ── Required ─────────────────────────────────
+project_id  = "your-gcp-project-id"
+db_password = "change-me-strong-password"
+
+# ── Environment ──────────────────────────────
+environment = "dev"
+region      = "asia-southeast1"
+zone        = "asia-southeast1-a"
+
+# ── Cloud Run ────────────────────────────────
+api_image         = "gcr.io/cloudrun/hello"
+api_cpu           = "1"
+api_memory        = "512Mi"
+api_min_instances = 0
+api_max_instances = 3
+
+# ── Cloud SQL ────────────────────────────────
+db_tier = "db-f1-micro"
+
+# ── External API Keys ───────────────────────
+google_maps_api_key        = ""
+google_oauth_client_id     = ""
+google_oauth_client_secret = ""
+jwt_secret                 = ""
+
+# ── Alerting ─────────────────────────────────
+alert_email          = ""
+billing_alert_amount = 50
