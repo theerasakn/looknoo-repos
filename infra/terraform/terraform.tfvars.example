@@ -1,0 +1,33 @@
+# ──────────────────────────────────────────────
+# PawTrip GCP — terraform.tfvars.example
+# Copy this file to terraform.tfvars and fill in your values
+# ──────────────────────────────────────────────
+
+# ── Billing & Organization ───────────────────
+billing_account_id   = ""   # console.cloud.google.com/billing → Account ID
+org_id               = ""   # Personal account → leave empty
+
+# ── Admin / Alerts ───────────────────────────
+admin_email          = ""   # GCP admin email
+alert_email          = ""   # Billing alert recipient
+billing_alert_amount = 100  # USD per month
+
+# ── Region / Zone ────────────────────────────
+region = "asia-southeast1"
+zone   = "asia-southeast1-a"
+
+# ── Google Maps ──────────────────────────────
+google_maps_api_key = ""    # Google Maps Platform API key
+
+# ── Google OAuth (create via STEP_0_OAUTH.md) ─
+google_oauth_client_id     = ""   # 123456-xxxxx.apps.googleusercontent.com
+google_oauth_client_secret = ""   # GOCSPX-...
+
+# ── Auto-generated Secrets ───────────────────
+# Generate with:
+#   openssl rand -hex 32                                      → jwt_secret
+#   openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 20 → db passwords
+jwt_secret          = ""
+db_password_dev     = ""
+db_password_staging = ""
+db_password_prod    = ""
