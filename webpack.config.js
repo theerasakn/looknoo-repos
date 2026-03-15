@@ -27,7 +27,7 @@ module.exports = {
   entry: './index.web.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: 'bundle.[contenthash:8].js',
     publicPath: '/',
     clean: true,
   },
@@ -67,6 +67,9 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
     allowedHosts: 'all',
+    headers: {
+      'Cache-Control': 'no-store',
+    },
   },
   devtool: 'eval-source-map',
 };
