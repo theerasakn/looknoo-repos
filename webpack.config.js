@@ -43,6 +43,7 @@ module.exports = {
       'react-native-gesture-handler': path.resolve(__dirname, 'src/web/stubs/gestureHandler.tsx'),
       'react-native-screens': path.resolve(__dirname, 'src/web/stubs/screens.tsx'),
       '@react-navigation/native-stack': path.resolve(__dirname, 'src/web/stubs/nativeStack.tsx'),
+      '@react-navigation/stack': path.resolve(__dirname, 'src/web/stubs/nativeStack.tsx'),
     },
   },
   module: {
